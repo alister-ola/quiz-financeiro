@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Descubra Seu Perfil Financeiro</title>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f6f8;
+  padding: 20px;
+}
+
+.container {
+  max-width: 800px;
+  margin: auto;
+  background: #ffffff;
+  padding: 25px;
+  border-radius: 8px;
+}
+
+.headline {
+  text-align: center;
+}
+
+.headline h1 {
+  font-size: 28px;
+}
+
+.headline p {
+  color: #555;
+}
+
+/* PROGRESSO */
+.progress-container {
+  width: 100%;
+  background: #ddd;
+  border-radius: 20px;
+  margin: 20px 0;
+}
+
+.progress-bar {
+  height: 10px;
+  width: 0%;
+  background: #2e7d32;
+  border-radius: 20px;
+  transition: width 0.3s;
+}
+
+.question {
+  margin-bottom: 20px;
+}
+
+button {
+  background: #2e7d32;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #256428;
+}
+
+#emailBox, #resultado {
+  display: none;
+  margin-top: 30px;
+  padding: 20px;
+  border-radius: 8px;
+  background: #eef6f0;
+}
+
+input[type="email"] {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+}
+
+.cta {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.cta a {
+  background: #ff9800;
+  color: white;
+  padding: 14px 20px;
+  text-decoration: none;
+  font-weight: bold;
+  border-radius: 5px;
+  display: inline-block;
+}
+
+/* RESPONSIVO */
+@media (max-width: 600px) {
+  h1 { font-size: 22px; }
+  button { width: 100%; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="headline">
+  <h1>🧠💰 Descubra Seu Perfil Financeiro</h1>
+  <p>Responda em menos de 3 minutos e entenda como sua mente influencia suas decisões com dinheiro.</p>
+</div>
+
+<div class="progress-container">
+  <div class="progress-bar" id="progressBar"></div>
+</div>
+
+<form id="quiz"></form>
+
+<button onclick="calcularPerfil()">Quero ver meu resultado</button>
+
+<!-- CAPTURA DE E-MAIL -->
+<div id="emailBox">
+  <h3>📩 Para liberar seu resultado completo:</h3>
+  <p>Digite seu e-mail e receba sua análise personalizada.</p>
+
+  <form id="leadForm"
+        action="https://formsubmit.co/Alisterola30@gmail.com"
+        method="POST"
+        onsubmit="enviarLead(event)">
+
+    <input type="email" name="email" id="email" placeholder="Seu melhor e-mail" required>
+
+    <!-- CAMPOS OCULTOS -->
+    <input type="hidden" name="Perfil Financeiro" id="perfilHidden">
+    <input type="hidden" name="_subject" value="Novo Lead - Quiz Financeiro">
+    <input type="hidden" name="_captcha" value="false">
+
+    <button type="submit">Desbloquear meu perfil</button>
+  </form>
+</div>
+
+<div id="resultado"></div>
+
+</div>
+
+<script>
+const perguntas = [
+  "Quando você recebe um dinheiro extra, o que costuma fazer?",
+  "Como você se sente ao olhar seu extrato bancário?",
+  "Compras por impulso acontecem quando:",
+  "Seu relacionamento com planejamento financeiro é:",
+  "Pensar no futuro financeiro te gera:",
+  "Quando surge um imprevisto financeiro:",
+  "Investimentos, para você, são:",
+  "Suas metas financeiras são:",
+  "Dívidas te fazem sentir:",
+  "Qual frase mais parece com você?"
+];
+
+const respostas = [
+  ["Gasto com prazer imediato","Evito mexer","Penso demais","Direciono com objetivo"],
+  ["Depois resolvo","Prefiro evitar","Fico ansioso","Sou consciente"],
+  ["Emoções","Evito compras","Culpa depois","Analiso bem"],
+  ["Inexistente","Evito","Detalhado demais","Funcional"],
+  ["Aproveitar agora","Medo","Preocupação","Motivação"],
+  ["Gasto sem pensar","Paraliso","Fico tenso","Ajusto o plano"],
+  ["Entediantes","Confusos","Arriscados","Estratégia"],
+  ["Instáveis","Não tenho","Muitas","Claras"],
+  ["Indiferente","Nego","Medo","Controle"],
+  ["Eu mereço agora","Prefiro não lidar","E se der errado?","Tudo tem propósito"]
+];
+
+let perfilFinal = "";
+const quiz = document.getElementById("quiz");
+const progressBar = document.getElementById("progressBar");
+
+/* MONTAR QUIZ */
+perguntas.forEach((p, i) => {
+  let html = `<div class="question"><strong>${i+1}. ${p}</strong><br>`;
+  ["A","B","C","D"].forEach((l, idx) => {
+    html += `
+      <label>
+        <input type="radio" name="q${i}" value="${l}" onclick="atualizarProgresso()">
+        ${l}) ${respostas[i][idx]}
+      </label><br>`;
+  });
+  html += `</div>`;
+  quiz.innerHTML += html;
+});
+
+function atualizarProgresso() {
+  const respondidas = document.querySelectorAll("input[type=radio]:checked").length;
+  progressBar.style.width = (respondidas / perguntas.length) * 100 + "%";
+}
+
+function calcularPerfil() {
+  const scores = {A:0,B:0,C:0,D:0};
+  new FormData(quiz).forEach(v => scores[v]++);
+  perfilFinal = Object.keys(scores).reduce((a,b)=>scores[a]>scores[b]?a:b);
+  document.getElementById("emailBox").style.display = "block";
+  window.scrollTo(0, document.body.scrollHeight);
+}
+
+function enviarLead(event) {
+  event.preventDefault();
+
+  const nomesPerfis = {
+    A: "O Impulsivo",
+    B: "O Evitador",
+    C: "O Planejador Ansioso",
+    D: "O Investidor Consciente"
+  };
+
+  document.getElementById("perfilHidden").value = nomesPerfis[perfilFinal];
+  document.getElementById("leadForm").submit();
+  mostrarResultadoFinal();
+}
+
+function mostrarResultadoFinal() {
+  const perfis = {
+    A: {
+      nome: "🟠 O Impulsivo",
+      texto: "Você usa o dinheiro para aliviar emoções. O primeiro passo é criar consciência antes da ação.",
+      link: "https://pay.kiwify.com.br/D2PLU7j"
+    },
+    B: {
+      nome: "🔵 O Evitador",
+      texto: "Evitar o dinheiro gera mais ansiedade. Clareza é o início da liberdade financeira.",
+      link: "https://pay.kiwify.com.br/epo9GIC"
+    },
+    C: {
+      nome: "🟡 O Planejador Ansioso",
+      texto: "Você busca segurança, mas precisa de simplicidade para avançar.",
+      link: "https://pay.kiwify.com.br/7zC3nzB"
+    },
+    D: {
+      nome: "🟢 O Investidor Consciente",
+      texto: "Você já está no caminho certo. Agora é hora de escalar.",
+      link: "https://pay.kiwify.com.br/cOiENhL"
+    }
+  };
+
+  const p = perfis[perfilFinal];
+
+  document.getElementById("resultado").innerHTML = `
+    <h2>${p.nome}</h2>
+    <p>${p.texto}</p>
+    <div class="cta">
+      <p><strong>Quer avançar para o próximo nível?</strong></p>
+      <a href="${p.link}" target="_blank">Clique aqui para continuar</a>
+    </div>
+  `;
+
+  document.getElementById("resultado").style.display = "block";
+}
+</script>
+
+</body>
+</html>
