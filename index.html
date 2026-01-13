@@ -101,9 +101,9 @@ input[type="email"] {
 }
 </style>
 </head>
-
 <body>
 
+  <iframe name="hidden_iframe" style="display:none;"></iframe>
 <div class="container">
 
 <div class="headline">
@@ -127,6 +127,7 @@ input[type="email"] {
   <form id="leadForm"
         action="https://formsubmit.co/Alisterola30@gmail.com"
         method="POST"
+        target="hidden_iframe"
         onsubmit="enviarLead(event)">
 
     <input type="email" name="email" id="email" placeholder="Seu melhor e-mail" required>
@@ -258,4 +259,5 @@ function mostrarResultadoFinal() {
 
 </body>
 </html>
+
 
